@@ -100,10 +100,21 @@ function markAllBoxes(){
 					}
 				}
 				
-				cell.className = "eventDay";
-				cell.eventYear = yearInt;
-				cell.eventMonth = month;
-				cell.eventDate = date;
+				if ( i == 0 && date > 20 ){
+					month = monthInt - 1;
+					if ( month < 1 )
+						month = 12;
+				}
+				else if ( i == 4 && date < 10 ){
+					month = monthInt + 1;
+					if ( month > 12 )
+						month = 1;
+				}
+				
+				cell.className = "eventDay week" + i.toString();
+				cell.eventYear = parseInt( yearInt );
+				cell.eventMonth = parseInt( month );
+				cell.eventDate = parseInt( date );
 			}
 		}
 	}
@@ -111,19 +122,26 @@ function markAllBoxes(){
 
 function collectEvents(){
 	var eventDays = document.getElementsByClassName( "eventDay" );
+	var weeks = getCheckedBoxes();
 	
-	for ( var i = 0; i < eventDays.length; i++ ){
-		var day = eventDays[i];
-		var hope = day.getElementsByClassName( "divContend" )[0];
-		if ( hope && hope.children[1] ){
-			var rawData = hope.children[1].children[0].children[0].children[0];
-			
-			rawData = rawData.innerHTML.trim().replace( "<br>", "" ).replace( "\n", "" ).replace( "\t", "" );
-			
-			var tStart = rawData.substr( 0, 8 );//.replace( " ", "" );
-			var tEnd = rawData.substr( 9, 8 );//.replace( " ", "" );
-			
-			Events.push( new Event( day.eventYear, day.eventMonth, day.eventDate, tStart, tEnd ) );
+	for ( var i = 0; i < weeks.length; i++ ){
+		var curWeek = weeks[i];
+		var daysInWeek = document.getElementsByClassName( "eventDay week" + curWeek.toString() );
+		for ( var j = 0; j < daysInWeek.length; j++ ){
+			var day = daysInWeek[j];
+			var hope = day.getElementsByClassName( "divContend" )[0];
+			if ( hope && hope.children[1] ){
+				var rawData = hope.children[1].children[0].children[0].children[0];
+				
+				rawData = rawData.innerHTML.trim().replace( "<br>", "" ).replace( "\n", "" ).replace( "\t", "" );
+				
+				var tStart = rawData.substr( 0, 8 );//.replace( " ", "" );
+				var tEnd = rawData.substr( 9, 8 );//.replace( " ", "" );
+				var desc = rawData.substring( 17, rawData.length ).trim();
+				desc = desc.replace( "&amp;", "&" );
+				
+				Events.push( new Event( day.eventYear, day.eventMonth, day.eventDate, tStart, tEnd, desc ) );
+			}
 		}
 	}
 }
@@ -141,7 +159,7 @@ function generateCSV(){
 		
 		for ( var i = 0; i < Events.length; i++ ){
 			var cur = Events[i];
-			var subject = "Transportation,";
+			var subject = cur.description + ",";
 			var startDate = cur.month.toString() + "/" + cur.date.toString() +
 							"/" + cur.year.toString() + ",";
 			var startTime = cur.startTime.toString() + ",";
@@ -182,4 +200,36 @@ function addButton(){
 	rightmenu.insertBefore( exportButton, rightmenu.childNodes[0] );
 }
 
+function addCheckBoxes(){
+	var a = document.createElement( "a" );
+	a.id = "checkBoxes";
+	var inputs = [];
+	for ( var i = 0; i < 5; i++ ){
+		inputs.push( document.createElement( "input" ) );
+	}
+	for ( var i = 0; i < inputs.length; i++ ){
+		inputs[i].type = "checkbox";
+		inputs[i].id = "checkBox" + i.toString();
+		inputs[i].checked = true;
+		a.appendChild( inputs[i] );
+		
+		var span = document.createElement( "span" );
+		span.innerHTML = (i+1).toString();
+		a.appendChild( span );
+	}
+	var rightmenu = document.getElementsByClassName( "rightmenu" )[0];
+	rightmenu.insertBefore( a, rightmenu.childNodes[0] );
+}
+
+function getCheckedBoxes(){
+	var checkBoxes = document.getElementById( "checkBoxes" ).getElementsByTagName( "input" );
+	var checked = [];
+	for ( var i = 0; i < checkBoxes.length; i++ ){
+		if ( checkBoxes[i].checked )
+			checked.push( i );
+	}
+	return checked;
+}
+
 addButton();
+addCheckBoxes();
