@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         TimeForge Schedule Exporter
 // @namespace    ganonscrub_script
-// @version      0.1
+// @version      0.2
 // @description  Adds a button to export your schedule as a CSV
 // @author       ganonscrub
 // @include      *timeforge.com/Scheduler/sa/employeeSchedules.html*
 // @grant        none
-// @updateURL	 https://raw.githubusercontent.com/ganonscrub/TFSchExp/master/TFSchExp.js
+// @updateURL	 https://raw.githubusercontent.com/ganonscrub/TFSchEx/master/TFSchEx.js
 // ==/UserScript==
 
 function Event( year, month, date, tStart, tEnd, desc ){
